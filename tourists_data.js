@@ -82,7 +82,7 @@ const pieTourData = [
   { KINDS: '망상리조트', SUM: 117791 },
   { KINDS: '추암오토캠핑장', SUM: 38180 },
   { KINDS: '무릉계곡', SUM: 401970 }
-]
+];
 
 //인공암벽장
 const artificialRockClosetData = [ { YEAR: '2022', COUNT: '486' },{ YEAR: '2023', COUNT: '573' }  ];
