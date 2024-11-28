@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toastify 사이드 네비게이션</title>
+    
+    <!-- Toastify CDN -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/chart/latest/toastui-chart.min.css" />
+	<script src="https://uicdn.toast.com/chart/latest/toastui-chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script src="tourists_data.js"></script> <!-- 데이터 포함 -->
+    
+    <!-- 여기에 스타일 추가 -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <style>
+        /* 사이드 네비게이션 스타일 */
+        .side-nav {
+            width: 250px;
+            height: 100vh;
+            background-color: #2c3e50;
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: 20px;
+        }
+        .side-nav h2 {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+        }
+        .side-nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .side-nav ul li {
+            padding: 10px 20px;
+            border-bottom: 1px solid #34495e;
+        }
+        .side-nav ul li a {
+            color: white;
+            text-decoration: none;
+            display: block;
+        }
+        .side-nav ul li a:hover {
+            background-color: #34495e;
+        }
+
+        /* 메인 콘텐츠 영역 스타일 */
+        .content {
+            margin-left: 250px; /* 사이드바 너비 만큼 마진을 추가 */
+            padding: 20px;
+        }
+        .content h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        .content p {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+        }
+
+		.chart-container {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: space-between;
+			gap: 20px;
+		}
+
+		.chart-box {
+			width: 48%;  /* 한 행에 2개의 카드가 배치되도록 너비를 48%로 설정 */
+			margin-bottom: 20px;
+			background: #fff;
+			border-radius: 10px;
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+			padding: 20px;
+			display: flex;
+			align-items: center;  /* 카드 내에서 차트를 세로로 중앙 정렬 */
+			justify-content: center; /* 카드 내에서 차트를 가로로 중앙 정렬 */
+		}
+
+		canvas {
+			max-width: 100% !important;  /* 너비 100%로 설정 */
+			height: 350px !important; /* 고정된 높이 */
+		}
+
+
+
+    </style>
+</head>
+<body>
+    <!-- 사이드 네비게이션 -->
+    <nav class="side-nav">
+        <h2>Hi</h2>
+        <ul>
+            <li><a href="#" onclick="showToast('그래프 1 클릭!')">그래프 1</a></li>
+            <li><a href="#" onclick="showToast('그래프 2 클릭!')">그래프 2</a></li>
+            <li><a href="#" onclick="showToast('그래프 추가 클릭!')">그래프 추가</a></li>
+            <li><a href="#" onclick="showToast('설정 클릭!')">설정</a></li>
+        </ul>
+    </nav>
+
+    <!-- 메인 콘텐츠 영역 -->
+    <div class="content">
+        <!-- 차트 컨테이너 -->
+        <div class="chart-container">
+            <!-- 차트 1 카드 -->
+            <div class="chart-box">
+                <canvas id="myDonutChart1"></canvas>
+            </div>
+            <!-- 차트 2 카드 -->
+            <div class="chart-box">
+                <canvas id="myDonutChart2"></canvas>
+            </div>
+            <!-- 차트 3 카드 -->
+            <div class="chart-box">
+                <canvas id="myDonutChart3"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- 스크립트 -->
+    <script>
+	    const labels = pieTourData.map(item => item.KINDS);
+        const datas = pieTourData.map(item => item.SUM);
+		
+		// 바 차트를 그릴 캔버스 ID, 라벨, 데이터
+		const barLabels = ['A', 'B', 'C', 'D', 'E'];
+		const barData = [12, 19, 3, 5, 2];
+		
+		
+		// 색상 어둡게 만드는 함수
+		function darkenColor(color, factor = 0.2) {
+			// 색상 값이 HEX인지 RGBA인지 확인
+			let r, g, b;
+
+			// HEX 색상 처리
+			if (color[0] === '#') {
+				color = color.substring(1);
+				r = parseInt(color.substring(0, 2), 16);
+				g = parseInt(color.substring(2, 4), 16);
+				b = parseInt(color.substring(4, 6), 16);
+			} else {
+				// RGB 색상 처리
+				const rgb = color.match(/\d+/g);
+				r = parseInt(rgb[0]);
+				g = parseInt(rgb[1]);
+				b = parseInt(rgb[2]);
+			}
+
+			// 색상 어두워지게 조정
+			r = Math.floor(r * (1 - factor));
+			g = Math.floor(g * (1 - factor));
+			b = Math.floor(b * (1 - factor));
+
+			// 다시 HEX로 변환
+			return `rgb(${r}, ${g}, ${b})`;
+		}
+
+		// 차트 생성 함수
+		function createDonutChart(canvasId, backgroundColors) {
+			const data = {
+				labels: labels,
+				datasets: [{
+					data: datas,
+					backgroundColor: backgroundColors, // 구분이 잘 되는 색상 배열 사용
+					hoverBackgroundColor: backgroundColors.map(color => darkenColor(color)), // 마우스 오버 색상
+				}]
+			};
+
+			const options = {
+				responsive: true,
+				cutoutPercentage: 50,
+				plugins: {
+					legend: {
+						position: 'top',
+						labels: { color: '#000' }
+					},
+					tooltip: {
+						backgroundColor: '#333',
+						titleColor: '#fff',
+						bodyColor: '#fff',
+					}
+				}
+			};
+
+			const ctx = document.getElementById(canvasId).getContext('2d');
+			new Chart(ctx, {
+				type: 'doughnut',
+				data: data,
+				options: options
+			});
+		}
+
+		// 색상 팔레트 (더 명확한 구분을 위한 색상)
+		const colorPalette = [
+			'#FFB3BA', '#FFDFD3', '#FFEDB3', '#D0F0C0', '#B5EAD7',
+			'#C7CEEA', '#FF9CEE', '#F6A5C0', '#F1C6D1', '#D1E8E2'
+		];
+
+
+	function createBarChart(canvasId, labels, data) {
+		const barBackgroundColor = 'rgba(54, 162, 235, 0.2)';
+		const barBorderColor = 'rgba(54, 162, 235, 1)';
+
+		const chartData = {
+			labels: labels,
+			datasets: [{
+				label: 'Bar Chart Example',
+				data: data,
+				backgroundColor: barBackgroundColor,
+				borderColor: barBorderColor,
+				borderWidth: 1
+			}]
+		};
+
+		const options = {
+			responsive: true,
+			plugins: {
+				legend: {
+					position: 'top',
+					labels: { color: '#000' }
+				},
+				tooltip: {
+					backgroundColor: '#333',
+					titleColor: '#fff',
+					bodyColor: '#fff',
+				}
+			},
+			scales: {
+				y: {
+					beginAtZero: true
+				}
+			}
+		};
+
+		const ctx = document.getElementById(canvasId).getContext('2d');
+		new Chart(ctx, {
+			type: 'bar',
+			data: chartData,
+			options: options
+		});
+	}
+
+
+
+//=========================================================================
+
+	function createLineChart(canvasId, data) {
+		// 월 순서 정의
+		const months = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
+		
+		// 카테고리 중복 제거
+		const categories = [...new Set(data.map(item => item.CATEGORY))];
+		
+		// 데이터 가공: 각 카테고리별 데이터 처리
+		const datasets = categories.map(category => {
+			// 해당 카테고리의 데이터만 필터링
+			const categoryData = data.filter(item => item.CATEGORY === category);
+
+			// 월별 데이터 값 배열
+			const categoryValues = months.map(month => {
+				const monthData = categoryData.find(item => item.MONTH === month);
+				return monthData ? monthData.YEAR_23 : 0; // 해당 월 데이터가 없으면 0으로 설정
+			});
+
+			// 각 카테고리마다 데이터를 설정
+			return {
+				label: category,
+				data: categoryValues,
+				borderColor: getRandomColor(), // 랜덤 색상
+				fill: false, // 라인 밑을 채우지 않음
+				tension: 0.1 // 부드러운 곡선
+			};
+		});
+
+		// 차트 데이터 구성
+		const chartData = {
+			labels: months,
+			datasets: datasets
+		};
+
+		// 차트 옵션 설정
+		const options = {
+			responsive: true,
+			plugins: {
+				legend: {
+					position: 'top',
+					labels: { color: '#000' }
+				},
+				tooltip: {
+					backgroundColor: '#333',
+					titleColor: '#fff',
+					bodyColor: '#fff',
+				}
+			},
+			scales: {
+				x: {
+					title: {
+						display: true,
+						text: '월'
+					}
+				},
+				y: {
+					title: {
+						display: true,
+						text: '이용객 수'
+					},
+					beginAtZero: true
+				}
+			}
+		};
+
+		// 차트 그리기
+		const ctx = document.getElementById(canvasId).getContext('2d');
+		new Chart(ctx, {
+			type: 'line',
+			data: chartData,
+			options: options
+		});
+	}
+
+	// 랜덤 색상 생성 함수
+	function getRandomColor() {
+		const letters = '0123456789ABCDEF';
+		let color = '#';
+		for (let i = 0; i < 6; i++) {
+			color += letters[Math.floor(Math.random() * 16)];
+		}
+		return color;
+	}
+
+
+
+
+
+
+
+//=========================================================================
+
+
+
+		// 차트 1, 2, 3 생성 (각각 다른 색상 팔레트 사용)
+		createDonutChart('myDonutChart1', colorPalette);
+		// 바 차트 생성
+		createBarChart('myDonutChart2', barLabels, barData);
+		// 라인 차트를 그릴 캔버스 ID와 데이터
+		createLineChart('myDonutChart3', tourMonthData);
+    </script>
+</body>
+</html>
