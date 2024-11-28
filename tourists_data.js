@@ -83,3 +83,39 @@ const pieTourData = [
   { KINDS: '추암오토캠핑장', SUM: 38180 },
   { KINDS: '무릉계곡', SUM: 401970 }
 ]
+
+//인공암벽장
+const artificialRockClosetData = [ { YEAR: '2022', COUNT: '486' },{ YEAR: '2023', COUNT: '573' }  ];
+
+//무릉파크골프장
+const mulleungParkGolfData = [ { YEAR: '2023', COUNT: '2214' } ];
+
+//해오름스포츠 스크린골프장
+const haeoreumScreenGolfData =  [ { YEAR: '2023', COUNT: '538' } ];
+
+// 동해체육관
+const donghaeGymnasiumData = [
+  { YEAR: '2019', COUNT: '92,849' },
+  { YEAR: '2020', COUNT: '50,135' },
+  { YEAR: '2021', COUNT: '63,803' },
+  { YEAR: '2022', COUNT: '56,220' },
+  { YEAR: '2023', COUNT: '62,021' }
+];
+
+// 국민체육센터
+const nationalSportsCenterData = [
+  { YEAR: '2019', COUNT: '137,978' },
+  { YEAR: '2020', COUNT: '59,031' },
+  { YEAR: '2021', COUNT: '100,597' },
+  { YEAR: '2022', COUNT: '73,504' },
+  { YEAR: '2023', COUNT: '98,134' }
+];
+
+// 종합경기장
+const sportsComplexData = [
+  { YEAR: '2019', COUNT: '32,722' },
+  { YEAR: '2020', COUNT: '9,653' },
+  { YEAR: '2021', COUNT: '27,854' },
+  { YEAR: '2022', COUNT: '31,554' },
+  { YEAR: '2023', COUNT: '26,034' }
+];

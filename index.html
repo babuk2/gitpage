@@ -14,7 +14,7 @@
     <meta name="twitter:title" content="동해시 정보 시각화">
     <meta name="twitter:description" content="동해시의 데이터를 시각화 하여 보여줍니다">
     <meta name="twitter:image" content="https://i.postimg.cc/3JrcfhzY/logo.webp">
-
+	<link rel="icon" href="/favicon.ico" type="image/x-icon">
     <title></title>
     
     <!-- Toastify CDN -->
@@ -108,9 +108,10 @@
     <nav class="side-nav">
         <h2>Hi</h2>
         <ul>
-            <li><a href="#" onclick="showToast('그래프 1 클릭!')">동해시청</a></li>
-            <li><a href="#" onclick="showToast('그래프 2 클릭!')">동해시설관리공단</a></li>
-            <li><a href="#" onclick="showToast('설정 클릭!')">미구현</a></li>
+            <li><a href="#" onclick="showToast('그래프 1 클릭!')">그래프 1</a></li>
+            <li><a href="#" onclick="showToast('그래프 2 클릭!')">그래프 2</a></li>
+            <li><a href="#" onclick="showToast('그래프 추가 클릭!')">그래프 추가</a></li>
+            <li><a href="#" onclick="showToast('설정 클릭!')">설정</a></li>
         </ul>
     </nav>
 
@@ -130,6 +131,30 @@
             <div class="chart-box">
                 <canvas id="myDonutChart3"></canvas>
             </div>
+            <!-- 차트 1 카드 -->
+            <div class="chart-box">
+                <canvas id="myDonutChart4"></canvas>
+            </div>
+            <!-- 차트 2 카드 -->
+            <div class="chart-box">
+                <canvas id="myDonutChart5"></canvas>
+            </div>
+            <!-- 차트 3 카드 -->
+            <div class="chart-box">
+                <canvas id="myDonutChart6"></canvas>
+            </div>
+            <!-- 차트 1 카드 -->
+            <div class="chart-box">
+                <canvas id="myDonutChart7"></canvas>
+            </div>
+            <!-- 차트 2 카드 -->
+            <div class="chart-box">
+                <canvas id="myDonutChart8"></canvas>
+            </div>
+            <!-- 차트 3 카드 -->
+            <div class="chart-box">
+                <canvas id="myDonutChart9"></canvas>
+            </div>			
         </div>
     </div>
 
@@ -211,17 +236,21 @@
 			'#FFB3BA', '#FFDFD3', '#FFEDB3', '#D0F0C0', '#B5EAD7',
 			'#C7CEEA', '#FF9CEE', '#F6A5C0', '#F1C6D1', '#D1E8E2'
 		];
+//=========================================================================
 
+	function createBarChart(canvasId, data) {
+		// 데이터에서 연도와 카운트 값을 분리
+		const labels = data.map(item => item.YEAR); // 연도
+		const chartData = data.map(item => parseInt(item.COUNT.replace(',', ''))); // 카운트 (쉼표 제거 후 숫자 변환)
 
-	function createBarChart(canvasId, labels, data) {
 		const barBackgroundColor = 'rgba(54, 162, 235, 0.2)';
 		const barBorderColor = 'rgba(54, 162, 235, 1)';
 
-		const chartData = {
+		const chartDataConfig = {
 			labels: labels,
 			datasets: [{
-				label: 'Bar Chart Example',
-				data: data,
+				label: '이용자 수',
+				data: chartData,
 				backgroundColor: barBackgroundColor,
 				borderColor: barBorderColor,
 				borderWidth: 1
@@ -251,7 +280,7 @@
 		const ctx = document.getElementById(canvasId).getContext('2d');
 		new Chart(ctx, {
 			type: 'bar',
-			data: chartData,
+			data: chartDataConfig,
 			options: options
 		});
 	}
@@ -345,9 +374,77 @@
 	}
 
 
+//=========================================================================
 
+	function createLineChart2(canvasId, data) {
+	  // 연도만 추출 (데이터에서 YEAR과 COUNT 사용)
+	  const years = data.map(item => item.YEAR);
+	  const counts = data.map(item => parseInt(item.COUNT.replace(/,/g, ''))); // 쉼표 제거 후 숫자로 변환
 
+	  // 차트 데이터 구성
+	  const chartData = {
+		labels: years, // X축은 연도
+		datasets: [{
+		  label: '이용자 수',
+		  data: counts, // Y축 데이터는 관람객 수
+		  borderColor: getRandomColor(), // 랜덤 색상
+		  fill: false, // 라인 밑을 채우지 않음
+		  tension: 0.1 // 부드러운 곡선
+		}]
+	  };
 
+	  // 차트 옵션 설정
+	  const options = {
+		responsive: true,
+		plugins: {
+		  legend: {
+			position: 'top',
+			labels: { color: '#000' }
+		  },
+		  tooltip: {
+			backgroundColor: '#333',
+			titleColor: '#fff',
+			bodyColor: '#fff',
+		  }
+		},
+		scales: {
+		  x: {
+			title: {
+			  display: true,
+			  text: '연도'
+			}
+		  },
+		  y: {
+			title: {
+			  display: true,
+			  text: '이용자 수'
+			},
+			beginAtZero: true,
+			ticks: {
+			  callback: function(value) { return value.toLocaleString(); } // 숫자에 천 단위 쉼표 추가
+			}
+		  }
+		}
+	  };
+
+	  // 차트 그리기
+	  const ctx = document.getElementById(canvasId).getContext('2d');
+	  new Chart(ctx, {
+		type: 'line',
+		data: chartData,
+		options: options
+	  });
+	}
+
+	// 랜덤 색상 생성 함수
+	function getRandomColor() {
+	  const letters = '0123456789ABCDEF';
+	  let color = '#';
+	  for (let i = 0; i < 6; i++) {
+		color += letters[Math.floor(Math.random() * 16)];
+	  }
+	  return color;
+	}
 
 
 //=========================================================================
@@ -357,9 +454,55 @@
 		// 차트 1, 2, 3 생성 (각각 다른 색상 팔레트 사용)
 		createDonutChart('myDonutChart1', colorPalette);
 		// 바 차트 생성
-		createBarChart('myDonutChart2', barLabels, barData);
+		//createBarChart('myDonutChart2', barLabels, barData);
 		// 라인 차트를 그릴 캔버스 ID와 데이터
-		createLineChart('myDonutChart3', tourMonthData);
+		createLineChart('myDonutChart2', tourMonthData);
+		
+		
+		if(artificialRockClosetData.length < 5){
+			createBarChart('myDonutChart3', artificialRockClosetData);
+		}else{
+			createLineChart2('myDonutChart3', artificialRockClosetData);
+		}
+		
+		if(mulleungParkGolfData.length < 5){
+			createBarChart('myDonutChart4', mulleungParkGolfData);
+		}else{
+			createLineChart2('myDonutChart4', mulleungParkGolfData);
+		}
+		
+		if(haeoreumScreenGolfData.length < 5){
+			createBarChart('myDonutChart5', haeoreumScreenGolfData);
+		}else{
+			createLineChart2('myDonutChart5', haeoreumScreenGolfData);
+		}
+		
+		if(donghaeGymnasiumData.length < 5){
+			createBarChart('myDonutChart6', donghaeGymnasiumData);
+		}else{
+			createLineChart2('myDonutChart6', donghaeGymnasiumData);
+		}
+		
+		
+		if(nationalSportsCenterData.length < 5){
+			createBarChart('myDonutChart7', nationalSportsCenterData);
+		}else{
+			createLineChart2('myDonutChart7', nationalSportsCenterData);
+		}
+		
+		
+		if(sportsComplexData.length < 5){
+			createBarChart('myDonutChart8', sportsComplexData);
+		}else{
+			createLineChart2('myDonutChart8', sportsComplexData);
+		}
+		
+		
+		
+		
+		
+		
+		
     </script>
 </body>
 </html>
