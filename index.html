@@ -28,8 +28,14 @@
     <!-- 여기에 스타일 추가 -->
     <link rel="stylesheet" href="styles.css">
     
-    <style>
-        /* 사이드 네비게이션 스타일 */
+   <style>
+        /* 기본 스타일 */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        /* 사이드 네비게이션 */
         .side-nav {
             width: 250px;
             height: 100vh;
@@ -37,8 +43,12 @@
             color: white;
             position: fixed;
             top: 0;
-            left: 0;
+            left: -250px; /* 숨김 상태 */
             padding-top: 20px;
+            transition: 0.3s; /* 애니메이션 효과 */
+        }
+        .side-nav.open {
+            left: 0; /* 보임 상태 */
         }
         .side-nav h2 {
             text-align: center;
@@ -62,52 +72,69 @@
             background-color: #34495e;
         }
 
-        /* 메인 콘텐츠 영역 스타일 */
-        .content {
-            margin-left: 250px; /* 사이드바 너비 만큼 마진을 추가 */
-            padding: 20px;
-        }
-        .content h1 {
-            font-size: 2rem;
-            margin-bottom: 20px;
-        }
-        .content p {
+        /* 햄버거 버튼 */
+        .hamburger {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            z-index: 1000;
             font-size: 1.2rem;
-            margin-bottom: 40px;
+            border-radius: 5px;
         }
 
-		.chart-container {
-			display: flex;
-			flex-wrap: wrap;
-			justify-content: space-between;
-			gap: 20px;
-		}
+        /* 메인 콘텐츠 */
+        .content {
+            margin-left: 0; /* 사이드 네비게이션 숨김 상태 */
+            padding: 20px;
+            transition: 0.3s;
+        }
+        .content.shift {
+            margin-left: 250px; /* 사이드 네비게이션 보임 상태 */
+        }
 
-		.chart-box {
-			width: 48%;  /* 한 행에 2개의 카드가 배치되도록 너비를 48%로 설정 */
-			margin-bottom: 20px;
-			background: #fff;
-			border-radius: 10px;
-			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-			padding: 20px;
-			display: flex;
-			align-items: center;  /* 카드 내에서 차트를 세로로 중앙 정렬 */
-			justify-content: center; /* 카드 내에서 차트를 가로로 중앙 정렬 */
-		}
+        /* 차트 스타일 */
+        .chart-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-between;
+        }
+        .chart-box {
+            width: calc(50% - 10px);
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-		canvas {
-			max-width: 100% !important;  /* 너비 100%로 설정 */
-			height: 350px !important; /* 고정된 높이 */
-		}
-
-
-
+        /* 반응형 스타일 */
+        @media screen and (max-width: 768px) {
+            .chart-box {
+                width: 100%; /* 차트가 한 줄에 하나씩 표시 */
+            }
+        }
+        @media screen and (max-width: 480px) {
+            .hamburger {
+                font-size: 1rem;
+                padding: 8px 12px;
+            }
+        }
     </style>
-</head>
 <body>
+    <!-- 햄버거 버튼 -->
+    <button class="hamburger" onclick="toggleNav()">☰</button>
+
     <!-- 사이드 네비게이션 -->
-    <nav class="side-nav">
-        <h2>Hi</h2>
+    <nav class="side-nav" id="sideNav">
+        <h2>메뉴</h2>
         <ul>
             <li><a href="#" onclick="showToast('그래프 1 클릭!')">그래프 1</a></li>
             <li><a href="#" onclick="showToast('그래프 2 클릭!')">그래프 2</a></li>
@@ -164,7 +191,14 @@
 
     <!-- 스크립트 -->
     <script>
-	    const labels = pieTourData.map(item => item.KINDS);
+	function toggleSideNav() {
+            const sideNav = document.getElementById('sideNav');
+            sideNav.classList.toggle('open');
+        }
+		
+
+	    
+	const labels = pieTourData.map(item => item.KINDS);
         const datas = pieTourData.map(item => item.SUM);
 		
 		// 바 차트를 그릴 캔버스 ID, 라벨, 데이터
