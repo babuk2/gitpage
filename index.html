@@ -533,9 +533,11 @@
 		}
 		
 		
-			function toggleSideNav() {
+        function toggleNav() {
             const sideNav = document.getElementById('sideNav');
+            const content = document.getElementById('content');
             sideNav.classList.toggle('open');
+            content.classList.toggle('shift');
         }
 		
 		
